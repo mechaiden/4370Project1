@@ -5,13 +5,24 @@ import java.util.List;
 import uga.csx370.mydb.Predicate;
 import uga.csx370.mydb.RA;
 import uga.csx370.mydb.Relation;
+import uga.csx370.mydb.RelationBuilder;
 
 public class RAImpl implements RA {
 
     @Override
     public Relation select(Relation rel, Predicate p) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'select'");
+        Relation result = new RelationBuilder()
+                .attributeNames(rel.getAttrs())
+                .attributeTypes(rel.getTypes())
+                .build();
+        for (int i = 0; i < rel.getSize(); i++) {
+          if (p.check(rel.getRow(i))) {
+            result.insert(rel.getRow(i));
+          }
+        }
+        return result;
+        //throw new UnsupportedOperationException("Unimplemented method 'project'");
     }
 
     @Override
