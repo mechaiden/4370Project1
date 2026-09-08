@@ -34,11 +34,9 @@ public class Driver {
                 .attributeNames(List.of("course_id", "title", "dept_name", "credits"))
                 .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.INTEGER))
                 .build();
-        rel2.loadData("/Users/aidengoff23/sql_output/mysql-files/instructor_export.csv");
-        rel3.loadData("/Users/aidengoff23/sql_output/mysql-files/course_export.csv");
-        System.out.println("awg43376");
+        rel2.loadData("data/instructor_export.csv");
+        rel3.loadData("data/course_export.csv");
         rel2.print();
-        System.out.println("awg43376");
         rel3.print();
     }
 
