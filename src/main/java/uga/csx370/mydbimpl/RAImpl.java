@@ -35,16 +35,13 @@ public class RAImpl implements RA {
       List<Type> newTypes = new ArrayList<Type>();
       List<Type> oldTypes = rel.getTypes();
       List<String> oldAttrs = rel.getAttrs();
-      int[] unneededCols = new int[attrs.size()];
+      int[] neededCols = new int[attrs.size()];
       // This loop looks at each attribute in attrs and adds the corresponding type to newTypes
       for (int i = 0; i < attrs.size(); i++) {
         int index = oldAttrs.indexOf(attrs.get(i));
         if (index > 0) {
           newTypes.add(oldTypes.get(index));
-        } else {
-          unneededCols[i] = index; //This does not work. This will be an array of all -1. 
-                                   //May need to copy wanted values of each row to new row obj
-        }
+        } 
       }
       Relation result = new RelationBuilder()
               .attributeNames(attrs)
@@ -58,6 +55,7 @@ public class RAImpl implements RA {
       for (int i = 0; i < rel.getSize(); i++) {
         List<Cell> row = rel.getRow(i);
         //for(int k = 0; k < )
+        //Testing for push
       }
 
 
