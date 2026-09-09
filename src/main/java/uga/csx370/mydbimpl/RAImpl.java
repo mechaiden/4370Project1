@@ -79,7 +79,8 @@ public class RAImpl implements RA {
     @Override
     public Relation diff(Relation rel1, Relation rel2) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'diff'");
+        // Boris will do this method.
+	throw new UnsupportedOperationException("Unimplemented method 'diff'");
     }
 
     @Override
