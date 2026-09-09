@@ -126,6 +126,7 @@ public class RAImpl implements RA {
     @Override
     public Relation join(Relation rel1, Relation rel2) {
         // TODO Auto-generated method stub
+        // Testing branch status
         throw new UnsupportedOperationException("Unimplemented method 'join'");
     }
 
