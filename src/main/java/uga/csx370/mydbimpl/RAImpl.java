@@ -1,17 +1,19 @@
 package uga.csx370.mydbimpl;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import uga.csx370.mydb.Predicate;
+import uga.csx370.mydb.Type;
 import uga.csx370.mydb.RA;
 import uga.csx370.mydb.Relation;
 import uga.csx370.mydb.RelationBuilder;
+import uga.csx370.mydb.Cell;
 
 public class RAImpl implements RA {
 
     @Override
     public Relation select(Relation rel, Predicate p) {
-        // TODO Auto-generated method stub
         Relation result = new RelationBuilder()
                 .attributeNames(rel.getAttrs())
                 .attributeTypes(rel.getTypes())
@@ -27,6 +29,39 @@ public class RAImpl implements RA {
 
     @Override
     public Relation project(Relation rel, List<String> attrs) {
+      // Need to get type of each column.
+      // So need to find index of each attr in original relation
+      // Then copy the types of those columns to the new types list
+      List<Type> newTypes = new ArrayList<Type>();
+      List<Type> oldTypes = rel.getTypes();
+      List<String> oldAttrs = rel.getAttrs();
+      int[] unneededCols = new int[attrs.size()];
+      // This loop looks at each attribute in attrs and adds the corresponding type to newTypes
+      for (int i = 0; i < attrs.size(); i++) {
+        int index = oldAttrs.indexOf(attrs.get(i));
+        if (index > 0) {
+          newTypes.add(oldTypes.get(index));
+        } else {
+          unneededCols[i] = index; //This does not work. This will be an array of all -1. 
+                                   //May need to copy wanted values of each row to new row obj
+        }
+      }
+      Relation result = new RelationBuilder()
+              .attributeNames(attrs)
+              .attributeTypes(newTypes)
+              .build();
+      // Now need to copy over each row, removing the un-needed columns
+      // Easier to remove un-needed or add needed?
+      // Probably remove b/c then I don't need to construct whole new rows
+      // Probably want a list of indeces I need, can create in previous for loop
+      // What about .removeAll(collection) I don't think this will work because each element is a Cell
+      for (int i = 0; i < rel.getSize(); i++) {
+        List<Cell> row = rel.getRow(i);
+        //for(int k = 0; k < )
+      }
+
+
+
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'project'");
     }
