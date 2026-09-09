@@ -67,7 +67,39 @@ public class RAImpl implements RA {
     @Override
     public Relation union(Relation rel1, Relation rel2) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'union'");
+        rel1.getTypes().equals(rel2.getTypes());
+
+        if (!rel1.getTypes().equals(rel2.getTypes())) {
+            throw new IllegalArgumentException("Relations cannot be unioned");
+        }
+
+        Relation result = new RelationBuilder()
+            .attributeNames(rel1.getAttrs())
+            .attributeTypes(rel1.getTypes())
+            .build();
+
+        List<List<Cell>> seen = new ArrayList<>();
+
+        for (int i = 0; i < rel1.getSize(); i++) {
+            List<Cell> row = rel1.getRow(i);
+            if (!seen.contains(row)) {
+                seen.add(row);
+                result.insert(row);
+            }
+        }
+
+        for (int i = 0; i < rel2.getSize(); i++) {
+            List<Cell> row = rel2.getRow(i);
+            if (!seen.contains(row)) {
+                seen.add(row);
+                result.insert(row);
+            }
+        }
+
+        return result;
+
+
+
     }
 
     @Override

@@ -59,6 +59,19 @@ public class Driver {
         RA ra = new RAImpl();
         Relation physicsCourses = ra.select(rel3, deptPhysics);
         physicsCourses.print();
+
+
+        // UNION TEST
+        Predicate deptCybernetics = row -> {
+            int col = rel3.getAttrIndex("dept_name");
+            Cell deptCell = row.get(col);
+            String dept = deptCell.getAsString();
+            return dept.equals("Cybernetics");
+        };
+        Relation cyberneticsCourses = ra.select(rel3, deptCybernetics);
+        cyberneticsCourses.print();
+        Relation unionCourses = ra.union(physicsCourses, cyberneticsCourses);
+        unionCourses.print();
     }
 
 }
