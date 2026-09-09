@@ -41,7 +41,7 @@ public class RAImpl implements RA {
         int index = oldAttrs.indexOf(attrs.get(i));
         if (index > 0) {
           newTypes.add(oldTypes.get(index));
-        } 
+        }
       }
       Relation result = new RelationBuilder()
               .attributeNames(attrs)
