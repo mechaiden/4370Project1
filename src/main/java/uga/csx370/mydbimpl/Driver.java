@@ -31,21 +31,19 @@ public class Driver {
                 .build();
         */
 
-        /*
         Relation rel2 = new RelationBuilder()
-                .attributeNames(List.of("ID", "Name", "Dept_Name", "Salary"))
+                .attributeNames(List.of("id", "name", "dept_name", "salary"))
                 .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.DOUBLE))
                 .build();
         rel2.loadData("data/instructor_export.csv");
-        rel2.print();
-        */
+        // rel2.print();
 
         Relation rel3 = new RelationBuilder()
                 .attributeNames(List.of("course_id", "title", "dept_name", "credits"))
                 .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.INTEGER))
                 .build();
         rel3.loadData("data/course_export.csv");
-        rel3.print();
+        // rel3.print();
 
 
         //Select -------------------------------------------------------
@@ -63,7 +61,7 @@ public class Driver {
         Relation physicsCourses = ra.select(rel3, deptPhysics);
         physicsCourses.print();
 
-        //Project -------------------------------------------------------
+        // Project -------------------------------------------------------
         List<String> attrs = List.of("course_id", "title", "dept_name");
         Relation projectTest = ra.project(rel3, attrs);
         projectTest.print();
@@ -79,6 +77,10 @@ public class Driver {
         cyberneticsCourses.print();
         Relation unionCourses = ra.union(physicsCourses, cyberneticsCourses);
         unionCourses.print();
+
+        // Natural Join --------------------------------------------------
+        Relation join23 = ra.join(rel2, rel3);
+        // join23.print();
     }
 
 }
