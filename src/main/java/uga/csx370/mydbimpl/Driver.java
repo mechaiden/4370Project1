@@ -67,6 +67,18 @@ public class Driver {
         List<String> attrs = List.of("course_id", "title", "dept_name");
         Relation projectTest = ra.project(rel3, attrs);
         projectTest.print();
+
+        // UNION TEST
+        Predicate deptCybernetics = row -> {
+            int col = rel3.getAttrIndex("dept_name");
+            Cell deptCell = row.get(col);
+            String dept = deptCell.getAsString();
+            return dept.equals("Cybernetics");
+        };
+        Relation cyberneticsCourses = ra.select(rel3, deptCybernetics);
+        cyberneticsCourses.print();
+        Relation unionCourses = ra.union(physicsCourses, cyberneticsCourses);
+        unionCourses.print();
     }
 
 }
