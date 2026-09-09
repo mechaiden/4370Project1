@@ -46,6 +46,9 @@ public class Driver {
                 .build();
         rel3.loadData("data/course_export.csv");
         rel3.print();
+
+
+        //Select -------------------------------------------------------
         Predicate deptPhysics = row -> {
           // Row is a list of cells, so getting an index gets the specific cell value
           int col = rel3.getAttrIndex("dept_name");
@@ -59,6 +62,11 @@ public class Driver {
         RA ra = new RAImpl();
         Relation physicsCourses = ra.select(rel3, deptPhysics);
         physicsCourses.print();
+
+        //Project -------------------------------------------------------
+        List<String> attrs = List.of("course_id", "title", "dept_name");
+        Relation projectTest = ra.project(rel3, attrs);
+        projectTest.print();
     }
 
 }
