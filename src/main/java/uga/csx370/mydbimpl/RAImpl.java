@@ -101,8 +101,42 @@ public class RAImpl implements RA {
 
     @Override
     public Relation intersect(Relation rel1, Relation rel2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'intersect'");
+	// Error handling:
+	// 	Make sure same number of attributes
+	// 	Make sure attributes have compatible types.
+	//	
+//	if (rel1.getSize() != rel2.getSize()) {
+//		throw new IllegalArgumentException("Relations cannot be intersected; Different number of rows");
+//	}
+	if (!rel1.getTypes().equals(rel2.getTypes())) {
+		throw new IllegalArgumentException("Relations cannot be intersected; Attribute Types do not match.");
+	}
+
+
+	//Implementation:
+	//result = new empty relation,
+	//
+	//loop through each row in R1
+	//	compare each row R1  to each row in R2,
+	//	if R1 and R2 are equal, add it to result
+	//return result 
+	 Relation result = new RelationBuilder()
+            .attributeNames(rel1.getAttrs())
+            .attributeTypes(rel1.getTypes())
+            .build();	
+	
+	 for (int i = 0; i < rel1.getSize(); i++) {
+		List<Cell> rowR1 = rel1.getRow(i);
+	
+		for (int j = 0; j < rel2.getSize(); j++) {
+			List<Cell> rowR2 = rel2.getRow(j);	
+			if (rowR1.equals(rowR2)) {
+				result.insert(rowR1);
+			}
+		}
+	}
+
+    	return result;
     }
 
     @Override

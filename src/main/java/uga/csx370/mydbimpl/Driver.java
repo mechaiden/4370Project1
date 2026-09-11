@@ -25,7 +25,7 @@ public class Driver {
         // Path should be replaced with a correct file path for a compatible
         // CSV file.
         /*
-        Relation rel1 = new RelationBuilder()
+       Relation rel1 = new RelationBuilder()
                 .attributeNames(List.of("Col01_Name", "Col02_Name", "Col03_Name"))
                 .attributeTypes(List.of(Type.INTEGER, Type.STRING, Type.DOUBLE))
                 .build();
@@ -59,12 +59,12 @@ public class Driver {
         // Needed instance of RA
         RA ra = new RAImpl();
         Relation physicsCourses = ra.select(rel3, deptPhysics);
-        physicsCourses.print();
+        //physicsCourses.print();
 
         // Project -------------------------------------------------------
         List<String> attrs = List.of("course_id", "title", "dept_name");
         Relation projectTest = ra.project(rel3, attrs);
-        projectTest.print();
+        //projectTest.print();
 
         // UNION TEST
         Predicate deptCybernetics = row -> {
@@ -74,13 +74,39 @@ public class Driver {
             return dept.equals("Cybernetics");
         };
         Relation cyberneticsCourses = ra.select(rel3, deptCybernetics);
-        cyberneticsCourses.print();
+       // cyberneticsCourses.print();
         Relation unionCourses = ra.union(physicsCourses, cyberneticsCourses);
-        unionCourses.print();
+        //unionCourses.print();
+	
+	// Intersectt --------------------------------------------
+	//make a two different selects on a db, then intersect them
+	Predicate salary = row -> {
+		int col = rel2.getAttrIndex("salary");
+		return row.get(col).getAsDouble() > 50000;
+	};
+	Predicate highSalary = row -> {
+		int col = rel2.getAttrIndex("salary");
+		return row.get(col).getAsDouble() > 80000;
+	};
 
+	Relation sal = ra.select(rel2, salary);
+	Relation highSal = ra.select(rel2, highSalary);
+
+	Relation intersection = ra.intersect(sal, highSal);
+
+	System.out.println("salary:");
+	sal.print();
+
+	System.out.println("Higher salary:");
+	highSal.print();
+
+	System.out.println("Intersection:");
+	intersection.print();
+	System.out.println(sal.getSize());
+	System.out.println(highSal.getSize());
         // Natural Join --------------------------------------------------
         Relation join23 = ra.join(rel2, rel3);
-        join23.print();
+       // join23.print();
     }
 
 }
