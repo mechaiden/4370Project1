@@ -104,9 +104,15 @@ public class Driver {
 	intersection.print();
 	System.out.println(sal.getSize());
 	System.out.println(highSal.getSize());
-        // Natural Join --------------------------------------------------
+        System.out.println(intersection.equals(highSal));
+	// Rename -------------------------------------
+	List<String> oldNames = rel2.getAttrs();
+	List<String> newNames = List.of("newCourseID", "newTitle", "newDept_name", "new_credits");
+	Relation newName = ra.rename(rel2, oldNames, newNames);
+	newName.print();	
+	
+	// Natural Join --------------------------------------------------
         Relation join23 = ra.join(rel2, rel3);
        // join23.print();
     }
-
-}
+}	

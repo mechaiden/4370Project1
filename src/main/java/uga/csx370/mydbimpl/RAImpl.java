@@ -147,10 +147,27 @@ public class RAImpl implements RA {
 
     @Override
     public Relation rename(Relation rel, List<String> origAttr, List<String> renamedAttr) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'rename'");
-    }
+	
+	    //Throw IllegalArgument if any attr in orgAttr is not pressent in re1.
+	    for (int i = 0; i < origAttr.size(); i++) {
+		    if (!rel.getAttrs().contains(origAttr.get(i))){
+			    throw new IllegalArgumentException("Attribute in origAttr not pressent in relation.");
+		    }
+	    }
 
+ 			
+	    //Create a new relation with new name, and new attr names
+	   //copy every row from the original relation.
+	   Relation newRelation = new RelationBuilder()
+		   .attributeNames(renamedAttr)
+		   .attributeTypes(rel.getTypes())
+		   .build();
+	
+	   for (int i = 0; i < rel.getSize(); i++) {
+		   newRelation.insert(rel.getRow(i));
+	   }
+	   return newRelation;	    
+    }
     @Override
     public Relation cartesianProduct(Relation rel1, Relation rel2) {
         // TODO Auto-generated method stub
