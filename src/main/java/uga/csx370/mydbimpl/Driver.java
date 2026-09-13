@@ -80,6 +80,7 @@ public class Driver {
 
         // Natural Join --------------------------------------------------
         Relation join23 = ra.join(rel2, rel3);
+        // Comment for forcing merge conflict
         join23.print();
     }
 
