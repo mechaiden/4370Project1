@@ -141,10 +141,41 @@ public class RAImpl implements RA {
 
     @Override
     public Relation diff(Relation rel1, Relation rel2) {
-        // TODO Auto-generated method stub
-        // Boris will do this method.
-	throw new UnsupportedOperationException("Unimplemented method 'diff'");
-    }
+        // remember: rel1 - rel2 =/= rel2 - rel1
+        // check union-compatability
+        if (rel1.getAttrs() != rel2.getAttrs()) {
+            throw new IllegalArgumentException("Incompatible relations; same number of attributes required.");
+        }
+        if (!rel1.getTypes().equals(rel2.getTypes())) {
+            throw new IllegalArgumentException("Incompatible relations; same types of attributes required.");
+        }
+
+        // result must match rel1's schema (rel1 - rel2)
+        Relation result = new RelationBuilder(
+          .attributeNames(rel1.getAttrs())
+          .attributeTypes(rel1.getTypes())
+          .build());
+
+        for (int i = 0; i < rel1.getSize(); i++) {
+          List<Cell> row1 = rel1.getRow(i);
+          boolean match = false;
+
+          for (int j = 0; j < rel2.getSize(); j++) {
+            List<Cell> row2 = rel2.getRow(j);
+            
+            if (row1.equals(row2)) {
+              match = true;
+              break;
+            }
+          } // rel2's loop
+
+          if (!match) {
+            result.insert(row1);
+          } // add non-matching rows
+
+        } // rel1's loop
+        return result;
+    } // Relation
 
     @Override
     public Relation rename(Relation rel, List<String> origAttr, List<String> renamedAttr) {
@@ -279,6 +310,8 @@ public class RAImpl implements RA {
     @Override
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
         // TODO Auto-generated method stub
+        //theta join
+        //boris
         throw new UnsupportedOperationException("Unimplemented method 'join'");
     }
 

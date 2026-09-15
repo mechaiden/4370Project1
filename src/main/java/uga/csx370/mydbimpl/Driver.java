@@ -114,5 +114,12 @@ public class Driver {
 	// Natural Join --------------------------------------------------
         Relation join23 = ra.join(rel2, rel3);
         join23.print();
+
+        //set difference test
+        
+
+        //theta join test
+
+
     }
 }	
