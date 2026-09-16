@@ -81,6 +81,13 @@ public class Driver {
         // Natural Join --------------------------------------------------
         Relation join23 = ra.join(rel2, rel3);
         join23.print();
+
+        // Cartesian Product ---------------------------------------------
+        Relation coursesNoDept = ra.project(rel3, List.of("course_id", "title", "credits"));
+        Relation cart23 = ra.cartesianProduct(rel2, coursesNoDept);
+
+        cart23.print();
+
     }
 
 }
