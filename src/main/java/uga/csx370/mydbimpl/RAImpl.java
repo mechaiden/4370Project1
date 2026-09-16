@@ -309,10 +309,37 @@ public class RAImpl implements RA {
 
     @Override
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
-        // TODO Auto-generated method stub
         //theta join
-        //boris
-        throw new UnsupportedOperationException("Unimplemented method 'join'");
-    }
+
+        //concat row1 and row2 using List.addAll()
+        List<String> attributes = new ArrayList<>(rel1.getAttrs());
+        attributes.addAll(rel2.getAttrs());
+        List<Type> types = new ArrayList<>(rel1.getTypes());
+        types.addAll(rel2.getTypes());
+
+        Relation result = new RelationBuilder()
+          .attributeNames(attributes)
+          .attributeTypes(types)
+          .build();
+        
+        //iterative loops
+        for (int i = 0; i < rel1.getSize(); i++) {
+          List<Cell> row1 = rel1.getRow(i);
+
+          for (int j = 0; j < rel2.getSize(); j++) {
+            List<Cell> row2 = rel2.getRow(j);
+
+            List<Cell> rowResult = new ArrayList<>(row1);
+            rowResult.addAll(row2);
+
+            //add if predicate is satisfied
+            if (p.check(rowResult)) {
+              result.insert(rowResult);
+            }
+
+          } // rel2's loop
+        } // rel1's loop
+        return result;
+    } // join
 
 }
