@@ -59,12 +59,12 @@ public class Driver {
         // Needed instance of RA
         RA ra = new RAImpl();
         Relation physicsCourses = ra.select(rel3, deptPhysics);
-        //physicsCourses.print();
+        physicsCourses.print();
 
         // Project -------------------------------------------------------
         List<String> attrs = List.of("course_id", "title", "dept_name");
         Relation projectTest = ra.project(rel3, attrs);
-        //projectTest.print();
+        projectTest.print();
 
         // UNION TEST
         Predicate deptCybernetics = row -> {
@@ -115,10 +115,43 @@ public class Driver {
         Relation join23 = ra.join(rel2, rel3);
         join23.print();
 
-        //set difference test
-        
+        //------------------------------------------------ set difference test --------------------------------------------
+        List<String> deptOnly = List.of("dept_name");
 
-        //theta join test
+        Relation instructorDept = ra.project(rel2, deptOnly); 
+        Relation courseDept = ra.project(rel3, deptOnly); 
+
+        //TEST 1: Regular use cases
+        Relation deptNoCourses = ra.diff(instructorDept, courseDept);
+        System.out.println("\n\nInstructor's departments NOT offering courses:");
+        deptNoCourses.print();
+        System.out.println("Size: " + deptNoCourses.getSize());
+
+        Relation deptNoInstructors = ra.diff(courseDept, instructorDept);
+        System.out.println("Course's deptartments with NO instructors:");
+        deptNoInstructors.print();
+        System.out.println("Size: " + deptNoInstructors.getSize());    
+
+        //TEST 2: all matches -> empty relation outputted
+        Relation matchDept = ra.diff(instructorDept, instructorDept);
+        System.out.println("Diff on itself: " + matchDept.getSize());
+        
+        //TEST 3: no matches -> everything gets outputted
+        Relation emptyDept = new RelationBuilder()
+                .attributeNames(List.of("dept_name"))
+                .attributeTypes(List.of(Type.STRING))
+                .build();
+        emptyDept.insert(List.of(Cell.val("Potassium_Pulverizer")));
+
+        Relation noOverlapDiff = ra.diff(instructorDept, emptyDept);
+        System.out.println("Diff no overlap: " + noOverlapDiff.getSize() + "\nOriginal: " + instructorDept.getSize());
+
+        //TEST 4: More regular use cases: not physics
+        System.out.println("rel3 - deptPhysics:");
+        Relation noPhysics = ra.diff(rel3, physicsCourses);
+        noPhysics.print();
+
+        //------------------------------------------------ theta join test -----------------------------------------------
 
 
     }

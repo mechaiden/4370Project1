@@ -143,7 +143,7 @@ public class RAImpl implements RA {
     public Relation diff(Relation rel1, Relation rel2) {
         // remember: rel1 - rel2 =/= rel2 - rel1
         // check union-compatability
-        if (rel1.getAttrs() != rel2.getAttrs()) {
+        if (rel1.getAttrs().size() != rel2.getAttrs().size()) {
             throw new IllegalArgumentException("Incompatible relations; same number of attributes required.");
         }
         if (!rel1.getTypes().equals(rel2.getTypes())) {
@@ -151,10 +151,10 @@ public class RAImpl implements RA {
         }
 
         // result must match rel1's schema (rel1 - rel2)
-        Relation result = new RelationBuilder(
+        Relation result = new RelationBuilder()
           .attributeNames(rel1.getAttrs())
           .attributeTypes(rel1.getTypes())
-          .build());
+          .build();
 
         for (int i = 0; i < rel1.getSize(); i++) {
           List<Cell> row1 = rel1.getRow(i);
