@@ -311,9 +311,25 @@ public class RAImpl implements RA {
     public Relation join(Relation rel1, Relation rel2, Predicate p) {
         //theta join
 
+        //if duplicate names exist, specify which relation they came from
+        List<String> rel1names = rel1.getAttrs();
+        List<String> rel2names = rel2.getAttrs();
+
+        List<String> rel1newNames = new ArrayList<>();
+        for (String attr : rel1names) {
+          rel1newNames.add(rel2names.contains(attr) ? "rel1." + attr : attr);
+        }
+        List<String> rel2newNames = new ArrayList<>();
+        for (String attr : rel2names) {
+          rel2newNames.add(rel1names.contains(attr) ? "rel2." + attr : attr);
+        }
+
+        Relation rel1rename = rename(rel1, rel1names, rel1newNames);
+        Relation rel2rename = rename(rel2, rel2names, rel2newNames);
+
         //concat row1 and row2 using List.addAll()
-        List<String> attributes = new ArrayList<>(rel1.getAttrs());
-        attributes.addAll(rel2.getAttrs());
+        List<String> attributes = new ArrayList<>(rel1rename.getAttrs());
+        attributes.addAll(rel2rename.getAttrs());
         List<Type> types = new ArrayList<>(rel1.getTypes());
         types.addAll(rel2.getTypes());
 

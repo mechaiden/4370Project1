@@ -153,6 +153,43 @@ public class Driver {
 
         //------------------------------------------------ theta join test -----------------------------------------------
 
+        System.out.println("\n");
+        //dept_name is in both
 
+        //TEST 1: make sure join works normally
+        Predicate testEverything = row -> true;
+        Relation instructorAndCourse = ra.join(rel2, rel3, testEverything);
+        System.out.println("Instructor size: " + rel2.getSize());
+        System.out.println("Course size: " + rel3.getSize());
+        System.out.println("Instructor x Course Size: " + instructorAndCourse.getSize());
+
+        //TEST 2: Predicate makes theta join act like natural join
+        Predicate sameDept = row -> {
+                String instructorDepartment = row.get(2).getAsString(); // dept_name in rel1
+                String courseDepartment = row.get(6).getAsString(); // dept_name in rel2
+                return instructorDepartment.equals(courseDepartment);
+        };
+
+        Relation join23Theta = ra.join(rel2, rel3, sameDept);
+        System.out.println("Theta join size: " + join23Theta.getSize());
+        System.out.println("Natural join size: " + join23.getSize());
+        System.out.println("Are they the same?: " + (join23Theta.getSize() == join23.getSize()));
+
+        //TEST 3: A normal, reasonable predicate
+        Predicate rich4Credit = row -> {
+                double instSalary = row.get(3).getAsDouble();
+                int courseCredits = row.get(7).getAsInt();
+                return instSalary > 120000 && courseCredits >= 4;
+        };
+
+        Relation joinRich4Credit = ra.join(rel2, rel3, rich4Credit);
+        System.out.println("Salary > 100,000 AND credits >= 4, size: " + joinRich4Credit.getSize());
+        joinRich4Credit.print();
+
+        //TEST 4: Nothing matches the predicate
+        Predicate impossible = row -> false;
+        Relation emptyJoin = ra.join(rel2, rel3, impossible);
+        System.out.println("Theta join with impossible predicate: " + emptyJoin.getSize());
+        emptyJoin.print();
     }
 }	
