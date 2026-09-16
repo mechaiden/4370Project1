@@ -43,7 +43,7 @@ public class RAImpl implements RA {
           System.out.println("Index: " + index);
           newTypes.add(oldTypes.get(index));
           neededCols[i] = index;
-        } 
+        }
       }
       Relation result = new RelationBuilder()
               .attributeNames(attrs)
@@ -120,7 +120,36 @@ public class RAImpl implements RA {
     @Override
     public Relation cartesianProduct(Relation rel1, Relation rel2) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'cartesianProduct'");
+        //
+        for (String attr : rel1.getAttrs()) {
+            if (rel2.getAttrs().contains(attr)) {
+                throw new IllegalArgumentException("Attribute " + attr + " appears in both relations");
+            }
+        }
+        List<String> attrs = new ArrayList<String>(rel1.getAttrs());
+        attrs.addAll(rel2.getAttrs());
+        List<Type> types = new ArrayList<Type>(rel1.getTypes());
+        types.addAll(rel2.getTypes());
+
+
+        Relation result = new RelationBuilder()
+                .attributeNames(attrs)
+                .attributeTypes(types)
+                .build();
+
+        for (int i = 0; i < rel1.getSize(); i++) {
+            List<Cell> lRow = rel1.getRow(i);
+            for (int j = 0; j < rel2.getSize(); j++) {
+                List<Cell> newRow = new ArrayList<Cell>(attrs.size());
+                newRow.addAll(lRow);
+                newRow.addAll(rel2.getRow(j));
+                result.insert(newRow);
+
+            }
+        }
+
+
+        return result;
     }
 
     @Override
@@ -189,7 +218,7 @@ public class RAImpl implements RA {
               .build();
 
       // Could use some sort of hash function but I don't know how to do that
-      // This has complexity o(nmk) 
+      // This has complexity o(nmk)
       // where n and m are the # of rows in each relation and k is # of matching columns
       boolean matchingRow = false;
       for (int i = 0; i < thinRel.getSize(); i++) {
