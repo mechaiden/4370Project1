@@ -73,6 +73,8 @@ public class Driver {
       RA ra = new RAImpl();
       AIDENSAWESOMEQUERYNUMBER1(student,  instructor,  advisor, ra);
 
+      WyattQuery(section, department, teaches, instructor, ra);
+
 
 
 
@@ -269,5 +271,33 @@ public class Driver {
 
   public static void AIDENSAWESOMEQUERYNUMBER2() {
 
+  }
+
+  public static void WyattQuery(Relation section, Relation department, Relation teaches, Relation instructor, RA ra) {
+    Relation sectionsInDeptBuilding = ra.join(section, department);
+    Predicate fall2010 = row -> {
+      int yearIndex = sectionsInDeptBuilding.getAttrIndex("year");
+      int semesterIndex = sectionsInDeptBuilding.getAttrIndex("semester");
+      Cell yearCell = row.get(yearIndex);
+      Cell semesterCell = row.get(semesterIndex);
+      int year = yearCell.getAsInt();
+      String semester = semesterCell.getAsString();
+      return year == 2010 && semester.equals("Fall");
+    };
+    Relation sectionsInDeptBuildingFall2010 = ra.select(sectionsInDeptBuilding, fall2010);
+    sectionsInDeptBuildingFall2010 = ra.project(
+            sectionsInDeptBuildingFall2010, 
+            List.of("course_id", "sec_id", "year", "semester")
+    );
+    //sectionsInDeptBuildingFall2010.print();
+    Relation teachesIds = ra.join(sectionsInDeptBuildingFall2010, teaches);
+    Relation result = ra.join(teachesIds, instructor);
+    result = ra.project(
+            result,
+            List.of("ID", "name")
+    );
+    System.out.println("\nQuery: All teachers who taught a course in a department's building in the Fall Semester of 2010.");
+    result.print();
+    System.out.println("Rows: " + result.getSize());
   }
 }
