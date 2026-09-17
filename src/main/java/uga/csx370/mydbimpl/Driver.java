@@ -20,7 +20,7 @@ public class Driver {
     public static void main(String[] args) {
       // -------------------------------------Relation Builders Below--------------------------------------------
       Relation instructor = new RelationBuilder()
-              .attributeNames(List.of("id", "name", "dept_name", "salary"))
+              .attributeNames(List.of("ID", "name", "dept_name", "salary"))
               .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.DOUBLE))
               .build();
       instructor.loadData("data/instructor_export.csv");
@@ -31,6 +31,18 @@ public class Driver {
               .build();
       course.loadData("data/course_export.csv");
 
+      Relation student = new RelationBuilder()
+              .attributeNames(List.of("ID","name", "dept_name", "tot_cred"))
+              .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.INTEGER))
+              .build();
+      student.loadData("data/student_export.csv");
+
+      Relation advisor = new RelationBuilder()
+              .attributeNames(List.of("s_ID", "i_ID"))
+              .attributeTypes(List.of(Type.STRING, Type.STRING))
+              .build();
+      advisor.loadData("data/advisor_export.csv");
+
       // -----------------------------------Assignment Queries Below-------------------------------------------
       /*
        * FORMAT
@@ -38,6 +50,17 @@ public class Driver {
        * Then print a description of what it is. Similar to in class: All professors who teach students who .....
        * Then print the relational algebra formulation for it
        */
+      RA ra = new RAImpl();
+      AIDENSAWESOMEQUERYNUMBER1(student,  instructor,  advisor, ra);
+
+
+
+
+
+
+
+
+
 
 
       /*
@@ -73,7 +96,7 @@ public class Driver {
       // cyberneticsCourses.print();
       Relation unionCourses = ra.union(physicsCourses, cyberneticsCourses);
       //unionCourses.print();
-      
+
       // Intersect --------------------------------------------
       //make a two different selects on a db, then intersect them
       Predicate salary = row -> {
@@ -105,8 +128,8 @@ public class Driver {
       List<String> oldNames = rel2.getAttrs();
       List<String> newNames = List.of("newCourseID", "newTitle", "newDept_name", "new_credits");
       Relation newName = ra.rename(rel2, oldNames, newNames);
-      newName.print();	
-      
+      newName.print();
+
       // Natural Join --------------------------------------------------
       Relation join23 = ra.join(rel2, rel3);
       join23.print();
@@ -121,8 +144,8 @@ public class Driver {
       //------------------------------------------------ set difference test --------------------------------------------
       List<String> deptOnly = List.of("dept_name");
 
-      Relation instructorDept = ra.project(rel2, deptOnly); 
-      Relation courseDept = ra.project(rel3, deptOnly); 
+      Relation instructorDept = ra.project(rel2, deptOnly);
+      Relation courseDept = ra.project(rel3, deptOnly);
 
       //TEST 1: Regular use cases
       Relation deptNoCourses = ra.diff(instructorDept, courseDept);
@@ -133,12 +156,12 @@ public class Driver {
       Relation deptNoInstructors = ra.diff(courseDept, instructorDept);
       System.out.println("Course's deptartments with NO instructors:");
       deptNoInstructors.print();
-      System.out.println("Size: " + deptNoInstructors.getSize());    
+      System.out.println("Size: " + deptNoInstructors.getSize());
 
       //TEST 2: all matches -> empty relation outputted
       Relation matchDept = ra.diff(instructorDept, instructorDept);
       System.out.println("Diff on itself: " + matchDept.getSize());
-      
+
       //TEST 3: no matches -> everything gets outputted
       Relation emptyDept = new RelationBuilder()
               .attributeNames(List.of("dept_name"))
@@ -196,4 +219,35 @@ public class Driver {
       emptyJoin.print();
       */
   }
-}	
+
+  public static void AIDENSAWESOMEQUERYNUMBER1(Relation student, Relation instructor, Relation advisor, RA ra) {
+      Relation studentR = ra.rename(student,
+              List.of("ID", "name", "dept_name", "tot_cred"),
+              List.of("s_ID", "s_name", "s_dept", "tot_cred")
+      );
+
+      Relation instructorR = ra.rename(instructor,
+              List.of("ID", "name", "dept_name", "salary"),
+              List.of("i_ID", "i_name", "i_dept", "salary")
+      );
+
+      int deptCol = instructorR.getAttrIndex("i_dept");
+      Relation physicsInstructor = ra.select(instructorR, row -> row.get(deptCol).getAsString().equals("Physics"));
+
+      int credCol = studentR.getAttrIndex("tot_cred");
+      Relation seniorStudent = ra.select(studentR, row -> row.get(credCol).getAsInt() >= 100);
+
+      Relation physicsPair = ra.join(advisor, physicsInstructor);  //creates a match based on instuctor ID
+      Relation joined = ra.join(physicsPair, seniorStudent); // matches the student ID
+      Relation result = ra.project(joined, List.of("s_name", "tot_cred", "i_name"));
+
+      System.out.println("Query: Students with more than 100 credits who are advised by a phyiscs instructor.");
+      result.print();
+      System.out.println("Rows: " + result.getSize());
+
+  }
+
+  public static void AIDENSAWESOMEQUERYNUMBER2() {
+
+  }
+}

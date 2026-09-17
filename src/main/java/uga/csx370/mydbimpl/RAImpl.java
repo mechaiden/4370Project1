@@ -34,13 +34,9 @@ public class RAImpl implements RA {
       List<String> oldAttrs = rel.getAttrs();
       int[] neededCols = new int[attrs.size()];
       // This loop looks at each attribute in attrs and adds the corresponding type to newTypes
-      System.out.println(oldAttrs);
-      System.out.println(attrs);
       for (int i = 0; i < attrs.size(); i++) {
         int index = oldAttrs.indexOf(attrs.get(i));
-        System.out.println("Curr attr: " + attrs.get(i));
         if (index >= 0) {
-          System.out.println("Index: " + index);
           newTypes.add(oldTypes.get(index));
           neededCols[i] = index;
         }
@@ -104,7 +100,7 @@ public class RAImpl implements RA {
 	// Error handling:
 	// 	Make sure same number of attributes
 	// 	Make sure attributes have compatible types.
-	//	
+	//
 //	if (rel1.getSize() != rel2.getSize()) {
 //		throw new IllegalArgumentException("Relations cannot be intersected; Different number of rows");
 //	}
@@ -119,17 +115,17 @@ public class RAImpl implements RA {
 	//loop through each row in R1
 	//	compare each row R1  to each row in R2,
 	//	if R1 and R2 are equal, add it to result
-	//return result 
+	//return result
 	 Relation result = new RelationBuilder()
             .attributeNames(rel1.getAttrs())
             .attributeTypes(rel1.getTypes())
-            .build();	
-	
+            .build();
+
 	 for (int i = 0; i < rel1.getSize(); i++) {
 		List<Cell> rowR1 = rel1.getRow(i);
-	
+
 		for (int j = 0; j < rel2.getSize(); j++) {
-			List<Cell> rowR2 = rel2.getRow(j);	
+			List<Cell> rowR2 = rel2.getRow(j);
 			if (rowR1.equals(rowR2)) {
 				result.insert(rowR1);
 			}
@@ -162,7 +158,7 @@ public class RAImpl implements RA {
 
           for (int j = 0; j < rel2.getSize(); j++) {
             List<Cell> row2 = rel2.getRow(j);
-            
+
             if (row1.equals(row2)) {
               match = true;
               break;
@@ -179,7 +175,7 @@ public class RAImpl implements RA {
 
     @Override
     public Relation rename(Relation rel, List<String> origAttr, List<String> renamedAttr) {
-	
+
 	    //Throw IllegalArgument if any attr in orgAttr is not pressent in re1.
 	    for (int i = 0; i < origAttr.size(); i++) {
 		    if (!rel.getAttrs().contains(origAttr.get(i))){
@@ -187,18 +183,18 @@ public class RAImpl implements RA {
 		    }
 	    }
 
- 			
+
 	    //Create a new relation with new name, and new attr names
 	   //copy every row from the original relation.
 	   Relation newRelation = new RelationBuilder()
 		   .attributeNames(renamedAttr)
 		   .attributeTypes(rel.getTypes())
 		   .build();
-	
+
 	   for (int i = 0; i < rel.getSize(); i++) {
 		   newRelation.insert(rel.getRow(i));
 	   }
-	   return newRelation;	    
+	   return newRelation;
     }
     @Override
     public Relation cartesianProduct(Relation rel1, Relation rel2) {
@@ -366,7 +362,7 @@ public class RAImpl implements RA {
           .attributeNames(attributes)
           .attributeTypes(types)
           .build();
-        
+
         //iterative loops
         for (int i = 0; i < rel1.getSize(); i++) {
           List<Cell> row1 = rel1.getRow(i);
