@@ -43,6 +43,26 @@ public class Driver {
               .build();
       advisor.loadData("data/advisor_export.csv");
 
+      Relation section = new RelationBuilder()
+              .attributeNames(List.of("course_id","sec_id", "semester", "year", "building", "room_number", "time_slot_id"))
+              .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.INTEGER, Type.STRING, Type.STRING, Type.STRING))
+              .build();
+      section.loadData("data/section_export.csv");
+
+      Relation department = new RelationBuilder()
+              .attributeNames(List.of("dept_name","building", "budget"))
+              .attributeTypes(List.of(Type.STRING, Type.STRING, Type.DOUBLE))
+              .build();
+      department.loadData("data/department_export.csv");
+
+      Relation teaches = new RelationBuilder()
+              .attributeNames(List.of("ID", "course_id", "sec_id", "semester", "year"))
+              .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.STRING, Type.INTEGER))
+              .build();
+      teaches.loadData("data/teaches_export.csv");
+
+
+
       // -----------------------------------Assignment Queries Below-------------------------------------------
       /*
        * FORMAT
