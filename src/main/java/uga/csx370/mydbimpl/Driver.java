@@ -31,6 +31,27 @@ public class Driver {
               .build();
       course.loadData("data/course_export.csv");
 
+      //needed for sweatshopInstructor
+      
+      Relation advisor = new RelationBuilder()
+                .attributeNames(List.of("s_id", "i_id"))
+                .attributeTypes(List.of(Type.STRING, Type.STRING))
+                .build();      
+      advisor.loadData("data/advisor_export.csv");
+
+      Relation teaches = new RelationBuilder()
+                .attributeNames(List.of("id", "course_id", "sec_id", "semester", "year"))
+                .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.STRING, Type.INTEGER))
+                .build();
+      teaches.loadData("data/teaches_export.csv");
+
+      Relation department = new RelationBuilder()
+                .attributeNames(List.of("dept_name", "building", "budget"))
+                .attributeTypes(List.of(Type.STRING, Type.STRING, Type.DOUBLE))
+                .build();
+      department.loadData("data/department_export.csv");
+      
+
       // -----------------------------------Assignment Queries Below-------------------------------------------
       /*
        * FORMAT
@@ -38,6 +59,9 @@ public class Driver {
        * Then print a description of what it is. Similar to in class: All professors who teach students who .....
        * Then print the relational algebra formulation for it
        */
+
+      RA ra = new RAImpl();
+      sweatshopInstructor(instructor, advisor, teaches, department, ra);
 
 
       /*
@@ -195,5 +219,57 @@ public class Driver {
       System.out.println("Theta join with impossible predicate: " + emptyJoin.getSize());
       emptyJoin.print();
       */
-  }
+  } // main
+
+  /**
+   * Prints every instructor who is also an advisor,
+   * has a salary of 75,000 or lower,
+   * and works in a department with a budget of 500,000 or greater.
+   */
+  public static void sweatshopInstructor(Relation inst, Relation adv, Relation teach, Relation dept, RA ra) {
+        //underpaid instructors (salary <= 75000)
+        Predicate underpaid = row -> {
+                int col = inst.getAttrIndex("salary");
+                return row.get(col).getAsDouble() <= 75000;
+        };
+        Relation underpaidInst = ra.select(inst, underpaid);
+
+        //match the IDs
+        Predicate matchID = row -> {
+                String instructorID = row.get(0).getAsString();
+                String advisorID = row.get(5).getAsString();
+                return instructorID.equals(advisorID);
+        };
+        Relation instructorAdvisor = ra.join(underpaidInst, adv, matchID);
+
+        //make sure they teach a course
+        Predicate matchTeachesID = row -> {
+                String instructorID = row.get(0).getAsString();
+                String teachesID = row.get(6).getAsString();
+                return instructorID.equals(teachesID);
+        };
+        Relation teachesIA = ra.join(instructorAdvisor, teach, matchTeachesID);
+
+        //join with the departments' info
+        Relation departmentIA = ra.join(teachesIA, dept);
+
+        //wealthy departments (budget => 500000)
+        Predicate wealthyDept = row -> {
+                int col = departmentIA.getAttrIndex("budget");
+                return row.get(col).getAsDouble() >= 500000;
+        };
+        Relation wealthDepartment = ra.select(departmentIA, wealthyDept);
+
+        //project only instructor name, ID, salary, department, and department budget
+        List<String> finalAttributes = List.of("rel1.id", "name", "salary", "dept_name", "budget");
+        Relation underpaidIA = ra.project(wealthDepartment, finalAttributes);
+
+        //rename to account for renaming quirk of theta join
+        List<String> oldNames = underpaidIA.getAttrs(); // [rel1.id, name, salary, dept_name, budget]
+        List<String> newNames = List.of("id", "name", "salary", "dept_name", "budget");
+        Relation result = ra.rename(underpaidIA, oldNames, newNames);
+
+        System.out.println("Underpaid advisors teaching in wealthy departments:");
+        result.print();
+  } // sweatshopInstructor
 }	
