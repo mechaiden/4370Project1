@@ -18,34 +18,30 @@ import uga.csx370.mydb.RA;
 public class Driver {
 
     public static void main(String[] args) {
-      // Following is an example of how to use the relation class.
-      // This creates a table with three columns with below mentioned
-      // column names and data types.
-      // After creating the table, data is loaded from a CSV file.
-      // Path should be replaced with a correct file path for a compatible
-      // CSV file.
-      /*
-      Relation rel1 = new RelationBuilder()
-              .attributeNames(List.of("Col01_Name", "Col02_Name", "Col03_Name"))
-              .attributeTypes(List.of(Type.INTEGER, Type.STRING, Type.DOUBLE))
-              .build();
-      */
-
-      Relation rel2 = new RelationBuilder()
+      // -------------------------------------Relation Builders Below--------------------------------------------
+      Relation instructor = new RelationBuilder()
               .attributeNames(List.of("id", "name", "dept_name", "salary"))
               .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.DOUBLE))
               .build();
-      rel2.loadData("data/instructor_export.csv");
-      // rel2.print();
+      instructor.loadData("data/instructor_export.csv");
 
-      Relation rel3 = new RelationBuilder()
+      Relation course = new RelationBuilder()
               .attributeNames(List.of("course_id", "title", "dept_name", "credits"))
               .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.INTEGER))
               .build();
-      rel3.loadData("data/course_export.csv");
-      // rel3.print();
+      course.loadData("data/course_export.csv");
+
+      // -----------------------------------Assignment Queries Below-------------------------------------------
+      /*
+       * FORMAT
+       * Print the output of the query
+       * Then print a description of what it is. Similar to in class: All professors who teach students who .....
+       * Then print the relational algebra formulation for it
+       */
 
 
+      /*
+      -------------------DEVELOPEMENT TESTING BELOW---------------------------------------------
       //Select -------------------------------------------------------
       Predicate deptPhysics = row -> {
         // Row is a list of cells, so getting an index gets the specific cell value
@@ -198,5 +194,6 @@ public class Driver {
       Relation emptyJoin = ra.join(rel2, rel3, impossible);
       System.out.println("Theta join with impossible predicate: " + emptyJoin.getSize());
       emptyJoin.print();
+      */
   }
 }	
