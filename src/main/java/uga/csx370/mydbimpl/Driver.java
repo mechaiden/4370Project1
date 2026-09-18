@@ -67,7 +67,6 @@ public class Driver {
 	      .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.STRING, Type.DOUBLE, Type.STRING))
 	      .build();
       takes.loadData("data/takes_export.csv");
-
       // -----------------------------------Assignment Queries Below-------------------------------------------
       /*
        * FORMAT
@@ -76,20 +75,15 @@ public class Driver {
        * Then print the relational algebra formulation for it
        */
       RA ra = new RAImpl();
+
       AIDENSAWESOMEQUERYNUMBER1(student,  instructor,  advisor, ra);
       AIDENSAWESOMEQUERYNUMBER2(instructor, teaches, section, department, ra, course);
 
       WyattQuery(section, department, teaches, instructor, ra);
 
-
-
       matthewsMarvelousMechanicalQuery(student, takes, course, advisor, instructor, ra);
 
-
-
-
-
-
+      sweatshopInstructor(instructor, advisor, teaches, department, ra);
 
 
       /*
@@ -339,7 +333,6 @@ public class Driver {
 	};
 
 
-
 	Relation advisors = ra.join(advisor, studentch, studentAdvised);
 	Relation advisorIDs = ra.project(advisors, List.of("i_ID"));
 	advisorIDs = ra.rename(advisorIDs, List.of("i_ID"),List.of("ID"));
@@ -347,9 +340,69 @@ public class Driver {
 	result = ra.project(result, List.of("ID", "name"));
 	System.out.println("Query: Name and ID of advisors who advise a student that has exactly 30 credit hours.");
 	result.print();
+  System.out.println("Rows: " + result.getSize());
+}
 
-    	System.out.println("Rows: " + result.getSize());
+  /**
+   * Prints every instructor who is also an advisor, teaches at least one course,
+   * has a salary of 75,000 or lower, and works in a department with a budget of 500,000 or greater.
+   * Only prints out unique entries (no duplicates).
+   * 
+   * @param inst instructor relation
+   * @param adv advisor relation
+   * @param teach teacher relation
+   * @param dept department relation
+   * @param ra the RA implementation; necessary to run the query
+   */
+  public static void sweatshopInstructor(Relation inst, Relation adv, Relation teach, Relation dept, RA ra) {
+        //underpaid instructors (salary <= 75000)
+        Predicate underpaid = row -> {
+                int col = inst.getAttrIndex("salary");
+                return row.get(col).getAsDouble() <= 75000;
+        };
+        Relation underpaidInst = ra.select(inst, underpaid);
 
+        //match the IDs
+        Predicate matchID = row -> {
+                String instructorID = row.get(0).getAsString();
+                String advisorID = row.get(5).getAsString();
+                return instructorID.equals(advisorID);
+        };
+        Relation instructorAdvisor = ra.join(underpaidInst, adv, matchID);
 
-  }
+        //make sure they teach a course
+        Predicate matchTeachesID = row -> {
+                String instructorID = row.get(0).getAsString();
+                String teachesID = row.get(6).getAsString();
+                return instructorID.equals(teachesID);
+        };
+        Relation teachesIA = ra.join(instructorAdvisor, teach, matchTeachesID);
+
+        //natural join with the departments' info
+        Relation departmentIA = ra.join(teachesIA, dept);
+
+        //wealthy departments (budget => 500000)
+        Predicate wealthyDept = row -> {
+                int col = departmentIA.getAttrIndex("budget");
+                return row.get(col).getAsDouble() >= 500000;
+        };
+        Relation wealthDepartment = ra.select(departmentIA, wealthyDept);
+
+        //project only instructor name, ID, salary, dept_name, and department budget
+        List<String> finalAttributes = List.of("rel1.ID", "name", "salary", "dept_name", "budget");
+        Relation underpaidIA = ra.project(wealthDepartment, finalAttributes);
+
+        //rename to account for renaming schema of theta join
+        //for more info, refer to the inline comments in RAImpl.java
+        List<String> oldNames = underpaidIA.getAttrs(); // [rel1.id, name, salary, dept_name, budget]
+        List<String> newNames = List.of("ID", "name", "salary", "dept_name", "budget");
+        Relation result = ra.rename(underpaidIA, oldNames, newNames);
+
+        System.out.println("Query: Every instructor who is also an advisor, teaches at least one course,\n" +
+            "has a salary of 75,000 or lower, and works in a department with a budget of 500,000 or greater."
+        );
+        result.print();
+        System.out.println("Rows: " + result.getSize());
+  } // sweatshopInstructor
+  
 }
