@@ -222,9 +222,15 @@ public class Driver {
   } // main
 
   /**
-   * Prints every instructor who is also an advisor,
-   * has a salary of 75,000 or lower,
-   * and works in a department with a budget of 500,000 or greater.
+   * Prints every instructor who is also an advisor, teaches at least one course,
+   * has a salary of 75,000 or lower, and works in a department with a budget of 500,000 or greater.
+   * Only prints out unique entries (no duplicates).
+   * 
+   * @param inst instructor relation
+   * @param adv advisor relation
+   * @param teach teacher relation
+   * @param dept department relation
+   * @param ra the RA implementation; necessary to run the query
    */
   public static void sweatshopInstructor(Relation inst, Relation adv, Relation teach, Relation dept, RA ra) {
         //underpaid instructors (salary <= 75000)
@@ -250,7 +256,7 @@ public class Driver {
         };
         Relation teachesIA = ra.join(instructorAdvisor, teach, matchTeachesID);
 
-        //join with the departments' info
+        //natural join with the departments' info
         Relation departmentIA = ra.join(teachesIA, dept);
 
         //wealthy departments (budget => 500000)
@@ -260,11 +266,12 @@ public class Driver {
         };
         Relation wealthDepartment = ra.select(departmentIA, wealthyDept);
 
-        //project only instructor name, ID, salary, department, and department budget
+        //project only instructor name, ID, salary, dept_name, and department budget
         List<String> finalAttributes = List.of("rel1.id", "name", "salary", "dept_name", "budget");
         Relation underpaidIA = ra.project(wealthDepartment, finalAttributes);
 
-        //rename to account for renaming quirk of theta join
+        //rename to account for renaming schema of theta join
+        //for more info, refer to the inline comments in RAImpl.java
         List<String> oldNames = underpaidIA.getAttrs(); // [rel1.id, name, salary, dept_name, budget]
         List<String> newNames = List.of("id", "name", "salary", "dept_name", "budget");
         Relation result = ra.rename(underpaidIA, oldNames, newNames);
@@ -276,6 +283,10 @@ public class Driver {
 
   /**
    * Helper method that removes duplicates from relations.
+   * Acts like SQL's DISTINCT keyword
+   * 
+   * @param rel the relation to remove duplicates from
+   * @return a new relation with unique rows from rel only
    */
   private static Relation distinct(Relation rel) {
         Relation result = new RelationBuilder()
