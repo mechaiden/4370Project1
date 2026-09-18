@@ -310,17 +310,29 @@ public class Driver {
 
   public static void matthewsMarvelousMechanicalQuery(Relation student, Relation takes, Relation course, Relation advisor, Relation instructor, RA ra) {
  
-	System.out.println("Query: Advisors who advise a student with exactly 100 credit hours.");
-	Predicate hundredch = row -> {
+	Predicate ch = row -> {
 		int credCol = student.getAttrIndex("tot_cred");
-		return row.get(credCol).getAsInt() == 100;
+		return row.get(credCol).getAsInt() == 30;
 	};
-	Relation student100ch = ra.select(student, hundredch);
-	student100ch.print();
+	Relation studentch = ra.select(student, ch);
+	Predicate studentAdvised = row -> {
+		int studentID = studentch.getAttrIndex("ID");
+		int advisorSID = advisor.getAttrIndex("s_ID");
+		return row.get(studentID).equals(row.get(advisorSID));
+	};
 
-	Relation advisors = ra.join(advisor, student100ch);
-
+	
+	
+	Relation advisors = ra.join(advisor, studentch, studentAdvised);
 	Relation advisorIDs = ra.project(advisors, List.of("i_ID"));
-	advisorIDs.print();	
+	advisorIDs = ra.rename(advisorIDs, List.of("i_ID"),List.of("ID"));
+	Relation result = ra.join(advisorIDs, instructor);
+	result = ra.project(result, List.of("ID", "name"));
+	System.out.println("Query: Name and ID of advisors who advise a student that has exactly 30 credit hours.");
+	result.print();
+  
+    	System.out.println("Rows: " + result.getSize());
+	
+  
   }
 }
