@@ -77,6 +77,7 @@ public class Driver {
        */
       RA ra = new RAImpl();
       AIDENSAWESOMEQUERYNUMBER1(student,  instructor,  advisor, ra);
+      AIDENSAWESOMEQUERYNUMBER2(instructor, teaches, section, department, ra, course);
 
       WyattQuery(section, department, teaches, instructor, ra);
 
@@ -274,10 +275,26 @@ public class Driver {
       System.out.println("Rows: " + result.getSize());
 
   }
+  public static void AIDENSAWESOMEQUERYNUMBER2(Relation instructor, Relation teaches, Relation section, Relation department, RA ra, Relation course) {
+        int budgetCol = department.getAttrIndex("budget");
+        Relation cheapDepts = ra.select(department, row -> row.get(budgetCol).getAsDouble() < 300000);
 
-  public static void AIDENSAWESOMEQUERYNUMBER2() {
+        Relation instNoDept = ra.project(instructor, List.of("ID", "name", "salary"));
+        Relation courseTitles = ra.project(course, List.of("course_id", "title"));
 
-  }
+        Relation instTeaches = ra.join(instNoDept, teaches);
+        Relation withSection = ra.join(instTeaches, section);
+        Relation withDept = ra.join(withSection, cheapDepts);
+        Relation joined = ra.join(withDept, courseTitles);
+
+        Relation result = ra.project(joined,
+                List.of("name", "title", "dept_name", "building", "budget"));
+
+        System.out.println("Query: Instructors who teach a course in a building belonging to "
+                + "a department with a budget under $300,000.");
+        result.print();
+        System.out.println("Rows: " + result.getSize());
+    }
 
   public static void WyattQuery(Relation section, Relation department, Relation teaches, Relation instructor, RA ra) {
     Relation sectionsInDeptBuilding = ra.join(section, department);
@@ -289,10 +306,10 @@ public class Driver {
       int year = yearCell.getAsInt();
       String semester = semesterCell.getAsString();
       return year == 2010 && semester.equals("Fall");
-    };  
+    };
     Relation sectionsInDeptBuildingFall2010 = ra.select(sectionsInDeptBuilding, fall2010);
     sectionsInDeptBuildingFall2010 = ra.project(
-            sectionsInDeptBuildingFall2010, 
+            sectionsInDeptBuildingFall2010,
             List.of("course_id", "sec_id", "year", "semester")
     );
     //sectionsInDeptBuildingFall2010.print();
@@ -309,7 +326,7 @@ public class Driver {
 
 
   public static void matthewsMarvelousMechanicalQuery(Relation student, Relation takes, Relation course, Relation advisor, Relation instructor, RA ra) {
- 
+
 	Predicate ch = row -> {
 		int credCol = student.getAttrIndex("tot_cred");
 		return row.get(credCol).getAsInt() == 30;
@@ -321,8 +338,8 @@ public class Driver {
 		return row.get(studentID).equals(row.get(advisorSID));
 	};
 
-	
-	
+
+
 	Relation advisors = ra.join(advisor, studentch, studentAdvised);
 	Relation advisorIDs = ra.project(advisors, List.of("i_ID"));
 	advisorIDs = ra.rename(advisorIDs, List.of("i_ID"),List.of("ID"));
@@ -330,9 +347,9 @@ public class Driver {
 	result = ra.project(result, List.of("ID", "name"));
 	System.out.println("Query: Name and ID of advisors who advise a student that has exactly 30 credit hours.");
 	result.print();
-  
+
     	System.out.println("Rows: " + result.getSize());
-	
-  
+
+
   }
 }
