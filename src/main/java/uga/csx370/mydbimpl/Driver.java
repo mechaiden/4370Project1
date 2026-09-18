@@ -62,6 +62,11 @@ public class Driver {
       teaches.loadData("data/teaches_export.csv");
 
 
+      Relation takes = new RelationBuilder()
+	      .attributeNames(List.of("ID", "course_id", "sec_id", "semester", "year", "grade"))
+	      .attributeTypes(List.of(Type.STRING, Type.STRING, Type.STRING, Type.STRING, Type.DOUBLE, Type.STRING))
+	      .build();
+      takes.loadData("data/takes_export.csv");
 
       // -----------------------------------Assignment Queries Below-------------------------------------------
       /*
@@ -77,6 +82,7 @@ public class Driver {
 
 
 
+      matthewsMarvelousMechanicalQuery(student, takes, course, advisor, instructor, ra);
 
 
 
@@ -283,7 +289,7 @@ public class Driver {
       int year = yearCell.getAsInt();
       String semester = semesterCell.getAsString();
       return year == 2010 && semester.equals("Fall");
-    };
+    };  
     Relation sectionsInDeptBuildingFall2010 = ra.select(sectionsInDeptBuilding, fall2010);
     sectionsInDeptBuildingFall2010 = ra.project(
             sectionsInDeptBuildingFall2010, 
@@ -299,5 +305,22 @@ public class Driver {
     System.out.println("\nQuery: All teachers who taught a course in a department's building in the Fall Semester of 2010.");
     result.print();
     System.out.println("Rows: " + result.getSize());
+  }
+
+
+  public static void matthewsMarvelousMechanicalQuery(Relation student, Relation takes, Relation course, Relation advisor, Relation instructor, RA ra) {
+ 
+	System.out.println("Query: Advisors who advise a student with exactly 100 credit hours.");
+	Predicate hundredch = row -> {
+		int credCol = student.getAttrIndex("tot_cred");
+		return row.get(credCol).getAsInt() == 100;
+	};
+	Relation student100ch = ra.select(student, hundredch);
+	student100ch.print();
+
+	Relation advisors = ra.join(advisor, student100ch);
+
+	Relation advisorIDs = ra.project(advisors, List.of("i_ID"));
+	advisorIDs.print();	
   }
 }
