@@ -268,8 +268,36 @@ public class Driver {
         List<String> oldNames = underpaidIA.getAttrs(); // [rel1.id, name, salary, dept_name, budget]
         List<String> newNames = List.of("id", "name", "salary", "dept_name", "budget");
         Relation result = ra.rename(underpaidIA, oldNames, newNames);
+        Relation resultDistinct = distinct(result);
 
         System.out.println("Underpaid advisors teaching in wealthy departments:");
-        result.print();
+        resultDistinct.print();
   } // sweatshopInstructor
+
+  /**
+   * Helper method that removes duplicates from relations.
+   */
+  private static Relation distinct(Relation rel) {
+        Relation result = new RelationBuilder()
+            .attributeNames(rel.getAttrs())
+            .attributeTypes(rel.getTypes())
+            .build();
+
+        for (int i = 0; i < rel.getSize(); i++) {
+                List<Cell> row = rel.getRow(i);
+                boolean inList = false;
+                
+                for (int j = 0; j < result.getSize(); j++) {
+                        if (row.equals(result.getRow(j))) {
+                                inList = true;
+                                break;
+                        }
+                }
+                if (!inList) {
+                        result.insert(row);
+                }
+        }
+        return result;
+  } // distinct
+  
 }	
