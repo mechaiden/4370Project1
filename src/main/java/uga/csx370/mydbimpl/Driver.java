@@ -284,7 +284,7 @@ public class Driver {
         Relation result = ra.project(joined,
                 List.of("name", "title", "dept_name", "building", "budget"));
 
-        System.out.println("Query: Instructors who teach a course in a building belonging to "
+        System.out.println("\nQuery: Instructors who teach a course in a building belonging to "
                 + "a department with a budget under $300,000.");
         result.print();
         System.out.println("Rows: " + result.getSize());
@@ -313,7 +313,7 @@ public class Driver {
             result,
             List.of("ID", "name")
     );
-    System.out.println("\nQuery: All teachers who taught a course in a department's building in the Fall Semester of 2010.");
+    System.out.println("\nQuery: IDs and names of all instructors who taught a course in a department's building in the Fall Semester of 2010.");
     result.print();
     System.out.println("Rows: " + result.getSize());
   }
@@ -338,7 +338,7 @@ public class Driver {
 	advisorIDs = ra.rename(advisorIDs, List.of("i_ID"),List.of("ID"));
 	Relation result = ra.join(advisorIDs, instructor);
 	result = ra.project(result, List.of("ID", "name"));
-	System.out.println("Query: Name and ID of advisors who advise a student that has exactly 30 credit hours.");
+	System.out.println("\nQuery: Name and ID of advisors who advise a student that has exactly 30 credit hours.");
 	result.print();
   System.out.println("Rows: " + result.getSize());
 }
@@ -398,7 +398,7 @@ public class Driver {
         List<String> newNames = List.of("ID", "name", "salary", "dept_name", "budget");
         Relation result = ra.rename(underpaidIA, oldNames, newNames);
 
-        System.out.println("Query: Every instructor who is also an advisor, teaches at least one course,\n" +
+        System.out.println("\nQuery: Every instructor who is also an advisor, teaches at least one course,\n" +
             "has a salary of 75,000 or lower, and works in a department with a budget of 500,000 or greater."
         );
         result.print();
