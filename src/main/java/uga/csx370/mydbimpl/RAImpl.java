@@ -32,6 +32,7 @@ public class RAImpl implements RA {
       List<Type> newTypes = new ArrayList<Type>();
       List<Type> oldTypes = rel.getTypes();
       List<String> oldAttrs = rel.getAttrs();
+      List<List<Cell>> usedRows = new ArrayList<>();
       int[] neededCols = new int[attrs.size()];
       // This loop looks at each attribute in attrs and adds the corresponding type to newTypes
       for (int i = 0; i < attrs.size(); i++) {
@@ -52,7 +53,10 @@ public class RAImpl implements RA {
         for(int k = 0; k < attrs.size(); k++) {
           newRow.add(row.get(neededCols[k]));
         }
-        result.insert(newRow);
+        if (!usedRows.contains(newRow)) {
+          usedRows.add(newRow);
+          result.insert(newRow);
+        }
       }
       return result;
     }
